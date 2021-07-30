@@ -69,7 +69,7 @@ function calculatePendingReward(totalStaked, state, memberStaked, memberDebt, ti
 
 // Staking client class
 class StakingClient {
-    static async getStakingPoolInformation(connection, stakingPoolAddress) {
+    static async getStakingPoolInformation(connection, stakingPoolAddress, fabPrice, fabLpPrice) {
         let dynamicProvider = loadProgramWithoutWallet(connection, stakingPoolAddress);
 
         const state = await stakingProgram.state();
@@ -78,19 +78,24 @@ class StakingClient {
             poolMintPublicKey = state.poolMintKey;
         }
 
+        const rewardPerBlockInFab = state.rewardPerBlock / anchor.web3.LAMPORTS_PER_SOL;
+        const numberOfBlocksPerYear = 2 * 60 * 60 * 24 * 365;   // 500ms
+
         const poolMint = await dynamicProvider.connection.getTokenSupply(
           poolMintPublicKey
         );
-
         const totalStaked = poolMint.value;
-        const totalReward = state.rewardPerBlock * (state.endBlock - state.startBlock);
-        let apr = (totalStaked.uiAmount == null || totalStaked.uiAmount === 0)
-          ? (totalReward / 1)
-          : (totalReward / (totalStaked.uiAmount * state.precision));
+          
+        const TVLInUSD = totalStaked.uiAmount * fabLpPrice;
+
+        const apr = (
+          (rewardPerBlockInFab * numberOfBlocksPerYear * fabPrice)
+           / TVLInUSD) * 100;
 
         return {
           totalLpStaked: totalStaked.uiAmount,
-          aprPercent: apr * 100
+          aprPercent: apr,
+          TVL: TVLInUSD
         };
     }
 
@@ -123,7 +128,10 @@ class StakingClient {
       const totalValueOfLPTokens = poolData.liquidity;
       const totalSupplyOfLPTokens = rpcJson.result.value.uiAmount;
       const price = totalValueOfLPTokens/totalSupplyOfLPTokens;
-      return price;
+      return {
+        fabLpPrice: price,
+        fabPrice: poolData.price
+      };
     }
 
     // Check if member account already exists
@@ -144,7 +152,7 @@ class StakingClient {
 
       return true;
     }
-
+    
     static async getMemberBalances(connection, stakingPoolAddress, publicKey) {
       let provider = loadProgramWithoutWallet(connection, stakingPoolAddress);
       const currentBlock = Math.floor(Date.now().valueOf() / 1000);

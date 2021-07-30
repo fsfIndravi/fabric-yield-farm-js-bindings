@@ -12,22 +12,36 @@ const STAKING_PROGRAM_ADDRESS           = new anchor.web3.PublicKey(
   JSON.parse(JSON.stringify(idl['program']['staking.programId']))
 );
 
-const provider = anchor.Provider.local('https://api.mainnet-beta.solana.com');
+const dummyWallet = {
+  signTransaction(tx) {
+    return new Promise<Transaction>(resolve => resolve(tx))
+  },
+  signAllTransactions(txs) {
+    return new Promise<any>(resolve => resolve(txs))
+  },
+  publicKey: new anchor.web3.PublicKey(
+    '11111111111111111111111111111111'
+  )
+}
+
+const provider = new anchor.Provider(
+  new anchor.web3.Connection('https://api.mainnet-beta.solana.com'),
+  dummyWallet,
+  anchor.Provider.defaultOptions()
+);
 anchor.setProvider(provider);
 
   (async () => {
     try {
-      // Get staking pool information using RPC
-      stakingPoolInfo = await stakingClient.getStakingPoolInformation(provider.connection, STAKING_PROGRAM_ADDRESS);  
-      
       // Get LP price data from Raydium
-      lpPrice = await stakingClient.getPoolPriceData(FAB_AMM, FAB_LP_MINT);
-      
-      // Calculate TVL
-      let TVL = stakingPoolInfo.totalLpStaked * lpPrice;
-      
+      const priceData = await stakingClient.getPoolPriceData(FAB_AMM, FAB_LP_MINT);
+      const fabLpPrice = priceData.fabLpPrice;
+      const fabPrice = priceData.fabPrice;
+
+      // Get staking pool information using RPC
+      const stakingPoolInfo = await stakingClient.getStakingPoolInformation(provider.connection, STAKING_PROGRAM_ADDRESS, fabPrice, fabLpPrice);  
+            
       // Create response
-      stakingPoolInfo["tvlUSD"] = TVL;
       console.log(stakingPoolInfo);
 
     } catch (e) {
