@@ -64,21 +64,21 @@ function calculatePendingReward(totalStaked, state, memberStaked, memberDebt, ti
     .div(precision)
     .sub(memberDebt);
 
-  return pendingReward.toNumber();
+    // Do not return a negative balance
+    // This means pool rewards have not begun
+    return pendingReward.toNumber() >= 0 ? pendingReward.toNumber() : 0;
 }
 
 // Staking client class
 class StakingClient {
-    static async getStakingPoolInformation(connection, stakingPoolAddress, fabPrice, fabLpPrice) {
+    static async getStakingPoolInformation(connection, stakingPoolAddress, price, lpPrice) {
         let dynamicProvider = loadProgramWithoutWallet(connection, stakingPoolAddress);
 
         const state = await stakingProgram.state();
 
-        if (poolMintPublicKey == null) {
-            poolMintPublicKey = state.poolMintKey;
-        }
+        const poolMintPublicKey = state.poolMintKey;
 
-        const rewardPerBlockInFab = state.rewardPerBlock / anchor.web3.LAMPORTS_PER_SOL;
+        const rewardPerBlock = state.rewardPerBlock / anchor.web3.LAMPORTS_PER_SOL;
         const numberOfBlocksPerYear = 2 * 60 * 60 * 24 * 365;   // 500ms
 
         const poolMint = await dynamicProvider.connection.getTokenSupply(
@@ -86,16 +86,16 @@ class StakingClient {
         );
         const totalStaked = poolMint.value;
           
-        const TVLInUSD = totalStaked.uiAmount * fabLpPrice;
+        const TVLInUSD = totalStaked.uiAmount * lpPrice;
 
         const apr = (
-          (rewardPerBlockInFab * numberOfBlocksPerYear * fabPrice)
+          (rewardPerBlock * numberOfBlocksPerYear * price)
            / TVLInUSD) * 100;
 
         return {
           totalLpStaked: totalStaked.uiAmount,
           aprPercent: apr,
-          TVL: TVLInUSD
+          TVL: TVLInUSD 
         };
     }
 
@@ -129,8 +129,8 @@ class StakingClient {
       const totalSupplyOfLPTokens = rpcJson.result.value.uiAmount;
       const price = totalValueOfLPTokens/totalSupplyOfLPTokens;
       return {
-        fabLpPrice: price,
-        fabPrice: poolData.price
+        lpTokenPrice: price,
+        tokenPrice: poolData.price
       };
     }
 
@@ -169,7 +169,6 @@ class StakingClient {
           pendingRewardAmount: pendingRewardAmount / web3.LAMPORTS_PER_SOL
         };
       } catch (e) {
-        console.error("Error getting user's balances: ", e);
         return {
           stakedAmount: 0,
           pendingRewardAmount: 0
