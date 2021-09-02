@@ -1,141 +1,133 @@
 {
-    "program": {
-      "staking.programId": "3wVH3KtApRpUAAZVEGtNNrzJ7AsBRpudzBcLQdwQRhpk",
-      "FAB.token": "EdAhkbj5nF9sRM7XN7ewuW8C9XEUMs8P7cnoQ57SYE96",
-      "FAB_LP.token" : "5rTCvZq6BcApsC3VV1EEUuTJfaVd8uYhcGjwTy1By6P8",
-      "FAB_AMM.address" : "7eM9KWYiJmNfDfeztMoEZE1KPyWD54LRxM9GmRY9ske6"
-    },
-    "staking-idl":
-    {
-      "version": "0.0.0",
-      "name": "staking",
-      "instructions": [
-      ],
-      "state": {
-        "struct": {
-          "name": "StakingPool",
-          "type": {
-            "kind": "struct",
-            "fields": [
-              {
-                "name": "poolKey",
-                "type": "publicKey"
-              },
-              {
-                "name": "authorityKey",
-                "type": "publicKey"
-              },
-              {
-                "name": "derivedKey",
-                "type": "publicKey"
-              },
-              {
-                "name": "nonce",
-                "type": "u8"
-              },
-              {
-                "name": "stakingMintKey",
-                "type": "publicKey"
-              },
-              {
-                "name": "rewardMintKey",
-                "type": "publicKey"
-              },
-              {
-                "name": "poolMintKey",
-                "type": "publicKey"
-              },
-              {
-                "name": "poolMintExponent",
-                "type": "u8"
-              },
-              {
-                "name": "precision",
-                "type": "u64"
-              },
-              {
-                "name": "stakeRate",
-                "type": "u64"
-              },
-              {
-                "name": "rewardVaultKey",
-                "type": "publicKey"
-              },
-              {
-                "name": "accruedTokenPerShare",
-                "type": "u64"
-              },
-              {
-                "name": "startBlock",
-                "type": "i64"
-              },
-              {
-                "name": "endBlock",
-                "type": "i64"
-              },
-              {
-                "name": "lastRewardBlock",
-                "type": "i64"
-              },
-              {
-                "name": "rewardPerBlock",
-                "type": "u64"
-              }
-            ]
-          }
-        },
-        "methods": [
-        ]
+  "staking-idl":
+  {
+    "version": "0.0.2",
+    "name": "staking",
+    "instructions": [],
+    "state": {
+      "struct": {
+        "name": "StakingPool",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "poolKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "authorityKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "derivedKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "nonce",
+              "type": "u8"
+            },
+            {
+              "name": "stakingMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "rewardMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "poolMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "poolMintExponent",
+              "type": "u8"
+            },
+            {
+              "name": "precision",
+              "type": "u64"
+            },
+            {
+              "name": "stakeRate",
+              "type": "u64"
+            },
+            {
+              "name": "rewardVaultKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "accruedTokenPerShare",
+              "type": "u64"
+            },
+            {
+              "name": "startBlock",
+              "type": "i64"
+            },
+            {
+              "name": "endBlock",
+              "type": "i64"
+            },
+            {
+              "name": "lastRewardBlock",
+              "type": "i64"
+            },
+            {
+              "name": "rewardPerBlock",
+              "type": "u64"
+            }
+          ]
+        }
       },
-      "accounts": [
-        {
-          "name": "Member",
-          "type": {
-            "kind": "struct",
-            "fields": [
-              {
-                "name": "authority",
-                "type": "publicKey"
-              },
-              {
-                "name": "metadata",
-                "type": "publicKey"
-              },
-              {
-                "name": "balances",
-                "type": {
-                  "defined": "BalanceSandbox"
-                }
-              },
-              {
-                "name": "rewardDebt",
-                "type": "u64"
-              },
-              {
-                "name": "nonce",
-                "type": "u8"
+      "methods": []
+    },
+    "accounts": [
+      {
+        "name": "Member",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "metadata",
+              "type": "publicKey"
+            },
+            {
+              "name": "balances",
+              "type": {
+                "defined": "BalanceSandbox"
               }
-            ]
-          }
+            },
+            {
+              "name": "rewardDebt",
+              "type": "u64"
+            },
+            {
+              "name": "nonce",
+              "type": "u8"
+            }
+          ]
         }
-      ],
-      "types": [
-        {
-          "name": "BalanceSandbox",
-          "type": {
-            "kind": "struct",
-            "fields": [
-              {
-                "name": "spt",
-                "type": "publicKey"
-              },
-              {
-                "name": "vaultStake",
-                "type": "publicKey"
-              }
-            ]
-          }
+      }
+    ],
+    "types": [
+      {
+        "name": "BalanceSandbox",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "spt",
+              "type": "publicKey"
+            },
+            {
+              "name": "vaultStake",
+              "type": "publicKey"
+            }
+          ]
         }
-      ]
-    }
+      }
+    ]
   }
+}
