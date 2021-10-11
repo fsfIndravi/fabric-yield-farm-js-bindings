@@ -9,7 +9,6 @@ const DEFAULT_PUB_KEY                   = new web3.PublicKey(
 );
 
 let stakingProgram;
-let poolMintPublicKey;
 
 // Load program IDLs without connected wallet
 function loadProgramWithoutWallet(connection, stakingProgramAddress) {
@@ -59,6 +58,7 @@ function calculatePendingReward(totalStaked, state, memberStaked, memberDebt, ti
   const multiplier = new BN(getMultiplier(new BN(lastRewardBlock), new BN(time), endBlock));
   const tokenReward = multiplier.mul(rewardPerBlock);
   const newAccruedTokenPerShare = accruedTokenPerShare.add(tokenReward.mul(precision).div(totalStaked));
+  // TODO: fix reward calculation when BN is large
   const pendingReward = memberStaked
     .mul(newAccruedTokenPerShare)
     .div(precision)
@@ -71,7 +71,7 @@ function calculatePendingReward(totalStaked, state, memberStaked, memberDebt, ti
 
 // Staking client class
 class StakingClient {
-    static async getStakingPoolInformation(connection, stakingPoolAddress, price, lpPrice) {
+    static async getStakingPoolInformation(connection, stakingPoolAddress, price, lpPrice, decimals) {
         let dynamicProvider = loadProgramWithoutWallet(connection, stakingPoolAddress);
 
         const state = await stakingProgram.state();
@@ -86,11 +86,9 @@ class StakingClient {
         );
         const totalStaked = poolMint.value;
           
-        const TVLInUSD = totalStaked.uiAmount * lpPrice;
+        const TVLInUSD = totalStaked.uiAmount * Math.pow(10, 9-decimals) * lpPrice;
 
-        const apr = (
-          (rewardPerBlock * numberOfBlocksPerYear * price)
-           / TVLInUSD) * 100;
+        const apr = ((rewardPerBlock * numberOfBlocksPerYear * price) / TVLInUSD) * 100;
 
         return {
           totalLpStaked: totalStaked.uiAmount,
@@ -153,22 +151,34 @@ class StakingClient {
       return true;
     }
     
-    static async getMemberBalances(connection, stakingPoolAddress, publicKey) {
+    static async getMemberBalances(connection, stakingPoolAddress, publicKey, decimals) {
       let provider = loadProgramWithoutWallet(connection, stakingPoolAddress);
       const currentBlock = Math.floor(Date.now().valueOf() / 1000);
       const state = (await stakingProgram.state());
 
       try {
         const memberAccount = await stakingProgram.account.member.associated(publicKey);
-        const memberStaked = new BN((await provider.connection.getTokenAccountBalance(memberAccount.balances.vaultStake)).value.amount);
+        var staked = await provider.connection.getTokenAccountBalance(memberAccount.balances.vaultStake);
+        var multiplier = web3.LAMPORTS_PER_SOL / Math.pow(10, 9-decimals);
+
+        const memberStaked = new BN((staked).value.amount);
+  
         const totalStaked = new BN((await provider.connection.getTokenSupply(state.poolMintKey)).value.amount);
-        const pendingRewardAmount = calculatePendingReward(totalStaked, state, memberStaked, memberAccount.rewardDebt, currentBlock);
+        
+        var pendingRewardAmount = 0;
+        
+        try {
+          pendingRewardAmount = calculatePendingReward(totalStaked, state, memberStaked, memberAccount.rewardDebt, currentBlock);
+        } catch (e) {
+          // console.log(e);
+        }
 
         return {
-          lpStaked: memberStaked.toNumber() / web3.LAMPORTS_PER_SOL,
+          lpStaked: memberStaked.toNumber() / multiplier,
           pendingRewardAmount: pendingRewardAmount / web3.LAMPORTS_PER_SOL
         };
       } catch (e) {
+        // console.log(e);
         return {
           stakedAmount: 0,
           pendingRewardAmount: 0

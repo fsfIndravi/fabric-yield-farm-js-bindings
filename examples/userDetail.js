@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 
 const addresses = [
   "9nyXwvzzfh51irxBwvrU4MRjMkynDVuN4JBrbZyvaHJQ", 
-  "DS6vKvPBGQhvXanoLnxhNXKyc6EGhNdpzktYxHFuLNvv"
+  "FaVut8gzrBU5qmhH5WmyVGhP1hDiMBLjdRX9ho6jSBte"
 ];
 
 const provider = anchor.Provider.local('https://api.mainnet-beta.solana.com');
@@ -23,7 +23,8 @@ anchor.setProvider(provider);
           let balances = await stakingClient.getMemberBalances(
               provider.connection, 
               new anchor.web3.PublicKey(pool.stakingProgramId), 
-              new anchor.web3.PublicKey(address)
+              new anchor.web3.PublicKey(address),
+              pool.decimals
           );
   
           console.log(pool.poolName, ' user balances: ', balances);
