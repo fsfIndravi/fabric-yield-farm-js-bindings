@@ -39,7 +39,8 @@ anchor.setProvider(provider);
           provider.connection, 
           new anchor.web3.PublicKey(pool.stakingProgramId), 
           tokenPrice, 
-          lpPrice
+          lpPrice,
+          pool.decimals
         );  
               
         console.log(pool.poolToken, ' pool info: ', stakingPoolInfo);
