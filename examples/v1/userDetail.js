@@ -1,5 +1,5 @@
 const anchor = require("@project-serum/anchor");
-const stakingClient = require('../classes/stakingClient')
+const stakingClient = require('../../classes/stakingClient')
 const fetch = require("node-fetch");
 
 const addresses = [
@@ -18,16 +18,20 @@ anchor.setProvider(provider);
       const pools = poolsJson.data;
 
       for (const address of addresses) {
+        console.log('address:', address)
+
         for (const pool of pools) {
-          // Get user balances
-          let balances = await stakingClient.getMemberBalances(
-              provider.connection, 
-              new anchor.web3.PublicKey(pool.stakingProgramId), 
-              new anchor.web3.PublicKey(address),
-              pool.decimals
-          );
-  
-          console.log(pool.poolName, ' user balances: ', balances);
+          if (pool.poolType === 'v1') {
+            // Get user balances
+            let balances = await stakingClient.getMemberBalances(
+                provider.connection, 
+                new anchor.web3.PublicKey(pool.stakingProgramId), 
+                new anchor.web3.PublicKey(address),
+                pool.decimals
+            );
+    
+            console.log(pool.poolName, ' user balances: ', JSON.stringify(balances, null, 4));
+          }
         }
       }
     } catch (e) {

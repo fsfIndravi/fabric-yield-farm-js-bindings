@@ -1,5 +1,5 @@
 const anchor = require("@project-serum/anchor");
-const stakingClient = require('../classes/stakingClient');
+const stakingClient = require('../../classes/stakingClientV2');
 const fetch = require("node-fetch");
 
 const dummyWallet = {
@@ -29,21 +29,28 @@ anchor.setProvider(provider);
       const pools = poolsJson.data;
 
       for (const pool of pools) {
-        // Get LP price data from Raydium
-        const priceData = await stakingClient.getPoolPriceData(pool.ammId, pool.stakingTokenMint);
-        const lpPrice = priceData.lpTokenPrice;
-        const tokenPrice = priceData.tokenPrice;
-  
-        // Get staking pool information using RPC
-        const stakingPoolInfo = await stakingClient.getStakingPoolInformation(
-          provider.connection, 
-          new anchor.web3.PublicKey(pool.stakingProgramId), 
-          tokenPrice, 
-          lpPrice,
-          pool.decimals
-        );  
-              
-        console.log(pool.poolToken, ' pool info: ', stakingPoolInfo);
+        if (pool.poolType === 'v2') {
+          // Get LP price data from Raydium
+          const priceData = await stakingClient.getPoolPriceData(
+            pool.ammTokenA, 
+            pool.ammTokenB,
+            pool.ammTokenC,
+            pool.ammId,
+            pool.stakingTokenMint,
+            false
+          );
+          // Get staking pool information using RPC
+          const stakingPoolInfo = await stakingClient.getStakingPoolInformation(
+            provider.connection, 
+            new anchor.web3.PublicKey(pool.stakingProgramId), 
+            priceData.rewardTokenAPrice, 
+            priceData.rewardTokenBPrice,
+            priceData.rewardTokenCPrice,
+            priceData.stakingTokenPrice
+          );  
+                
+          console.log(pool.poolToken, ' pool info: ', stakingPoolInfo);
+        }
       }
 
     } catch (e) {

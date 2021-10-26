@@ -1,5 +1,5 @@
 {
-  "staking-idl":
+  "staking-v1-idl":
   {
     "version": "0.0.2",
     "name": "staking",
@@ -101,6 +101,399 @@
             },
             {
               "name": "rewardDebt",
+              "type": "u64"
+            },
+            {
+              "name": "nonce",
+              "type": "u8"
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "BalanceSandbox",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "spt",
+              "type": "publicKey"
+            },
+            {
+              "name": "vaultStake",
+              "type": "publicKey"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "staking-v2-idl": 
+  {
+    "version": "0.0.0",
+    "name": "triple_yield_staking",
+    "instructions": [],
+    "state": {
+      "struct": {
+        "name": "StakingPool",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "poolKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "authorityKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "derivedKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "nonce",
+              "type": "u8"
+            },
+            {
+              "name": "stakingMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "poolMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "poolMintExponent",
+              "type": "u8"
+            },
+            {
+              "name": "precision",
+              "type": "u64"
+            },
+            {
+              "name": "stakeRate",
+              "type": "u64"
+            },
+            {
+              "name": "rewardAMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "rewardAVaultKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "accruedTokenAPerShare",
+              "type": "u64"
+            },
+            {
+              "name": "rewardTokenAPerBlock",
+              "type": "u64"
+            },
+            {
+              "name": "initialRewardTokenAAmount",
+              "type": "u64"
+            },
+            {
+              "name": "rewardBMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "rewardBVaultKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "accruedTokenBPerShare",
+              "type": "u64"
+            },
+            {
+              "name": "rewardTokenBPerBlock",
+              "type": "u64"
+            },
+            {
+              "name": "initialRewardTokenBAmount",
+              "type": "u64"
+            },
+            {
+              "name": "rewardCMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "rewardCVaultKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "accruedTokenCPerShare",
+              "type": "u64"
+            },
+            {
+              "name": "rewardTokenCPerBlock",
+              "type": "u64"
+            },
+            {
+              "name": "initialRewardTokenCAmount",
+              "type": "u64"
+            },
+            {
+              "name": "startBlock",
+              "type": "i64"
+            },
+            {
+              "name": "endBlock",
+              "type": "i64"
+            },
+            {
+              "name": "lastRewardBlock",
+              "type": "i64"
+            },
+            {
+              "name": "poolType",
+              "type": "u8"
+            },
+            {
+              "name": "decayRate",
+              "type": "u64"
+            },
+            {
+              "name": "period",
+              "type": "u32"
+            }
+          ]
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "accounts": [
+            {
+              "name": "authority",
+              "isMut": false,
+              "isSigner": true
+            },
+            {
+              "name": "poolMint",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "rewardAVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rewardADepositor",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rewardBVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rewardBDepositor",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rewardCVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rewardCDepositor",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rewardAuthority",
+              "isMut": false,
+              "isSigner": true
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "rent",
+              "isMut": false,
+              "isSigner": false
+            }
+          ],
+          "args": [
+            {
+              "name": "stakingMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "rewardAMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "initialRewardTokenAAmount",
+              "type": "u64"
+            },
+            {
+              "name": "rewardBMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "initialRewardTokenBAmount",
+              "type": "u64"
+            },
+            {
+              "name": "rewardCMintKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "initialRewardTokenCAmount",
+              "type": "u64"
+            },
+            {
+              "name": "statePubKey",
+              "type": "publicKey"
+            },
+            {
+              "name": "stakingPoolNonce",
+              "type": "u8"
+            },
+            {
+              "name": "stakeRate",
+              "type": "u64"
+            },
+            {
+              "name": "startBlock",
+              "type": "i64"
+            },
+            {
+              "name": "poolType",
+              "type": "u8"
+            },
+            {
+              "name": "decayRate",
+              "type": "u64"
+            },
+            {
+              "name": "period",
+              "type": "u32"
+            }
+          ]
+        },
+        {
+          "name": "updateStartBlock",
+          "accounts": [
+            {
+              "name": "authority",
+              "isMut": false,
+              "isSigner": true
+            },
+            {
+              "name": "clock",
+              "isMut": false,
+              "isSigner": false
+            }
+          ],
+          "args": [
+            {
+              "name": "startBlock",
+              "type": "i64"
+            }
+          ]
+        },
+        {
+          "name": "updateEndBlock",
+          "accounts": [
+            {
+              "name": "authority",
+              "isMut": false,
+              "isSigner": true
+            },
+            {
+              "name": "clock",
+              "isMut": false,
+              "isSigner": false
+            }
+          ],
+          "args": [
+            {
+              "name": "endBlock",
+              "type": "i64"
+            }
+          ]
+        },
+        {
+          "name": "updateRewardPerBlock",
+          "accounts": [
+            {
+              "name": "authority",
+              "isMut": false,
+              "isSigner": true
+            },
+            {
+              "name": "clock",
+              "isMut": false,
+              "isSigner": false
+            }
+          ],
+          "args": [
+            {
+              "name": "rewardPerBlock",
+              "type": "u64"
+            }
+          ]
+        },
+        {
+          "name": "endRewards",
+          "accounts": [
+            {
+              "name": "authority",
+              "isMut": false,
+              "isSigner": true
+            },
+            {
+              "name": "clock",
+              "isMut": false,
+              "isSigner": false
+            }
+          ],
+          "args": []
+        }
+      ]
+    },
+    "accounts": [
+      {
+        "name": "Member",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "metadata",
+              "type": "publicKey"
+            },
+            {
+              "name": "balances",
+              "type": {
+                "defined": "BalanceSandbox"
+              }
+            },
+            {
+              "name": "tokenARewardDebt",
+              "type": "u64"
+            },
+            {
+              "name": "tokenBRewardDebt",
+              "type": "u64"
+            },
+            {
+              "name": "tokenCRewardDebt",
               "type": "u64"
             },
             {

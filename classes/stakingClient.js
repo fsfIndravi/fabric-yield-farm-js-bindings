@@ -30,7 +30,7 @@ function loadProgramWithoutWallet(connection, stakingProgramAddress) {
 
       stakingProgram = new anchor.Program(
         JSON.parse(
-          JSON.stringify(idl['staking-idl'])
+          JSON.stringify(idl['staking-v1-idl'])
         ), 
         stakingProgramAddress
       );
@@ -93,7 +93,9 @@ class StakingClient {
         return {
           totalLpStaked: totalStaked.uiAmount,
           aprPercent: apr,
-          TVL: TVLInUSD 
+          TVL: TVLInUSD,
+          startDate: (new Date(state.startBlock.toNumber() * 1000)).toUTCString(),
+          endDate: (new Date(state.endBlock.toNumber() * 1000)).toUTCString()
         };
     }
 
@@ -174,7 +176,7 @@ class StakingClient {
         }
 
         return {
-          lpStaked: memberStaked.toNumber() / multiplier,
+          stakedAmount: memberStaked.toNumber() / multiplier,
           pendingRewardAmount: pendingRewardAmount / web3.LAMPORTS_PER_SOL
         };
       } catch (e) {
